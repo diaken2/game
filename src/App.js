@@ -140,6 +140,7 @@ const story = {
     options: [{ text: "Да", next: "deception" }],
   },
   deception: {
+    color: "red",
     text: "ТВОИ ОТВЕТЫ НИ НА ЧТО НЕ ВЛИЯЛИ. ТЫ ПРОСТО СИДЕЛ И ДУМАЛ НАД ГЛУПЫМИ ВОПРОСАМИ БЕЗ КАКОГО-ЛИБО СМЫСЛА, ТРАТЯ СВОЁ ВРЕМЯ ВПУСТУЮ. ЧТО БЫ ТЫ НИ ОТВЕЧАЛ, Я БЫ ГОВОРИЛА ОДНО И ТО ЖЕ. ЕДИНСТВЕННЫЙ ВОПРОС, КОТОРЫЙ ИМЕЛ ЗДЕСЬ ХОТЬ КАКУЮ-ТО ДОЛЮ СМЫСЛА, ЭТО ПОЛУЧИШЬ ТЫ КОФЕ ИЛИ ЖЕ ЧАЙ. ИМЕННО ТАКУЮ ИГРУ ТЫ И ЗАСЛУЖИВАЕШЬ. БОЛЬШЕ НЕ ЗАХОДИ СЮДА.",
   },
 };
@@ -148,13 +149,16 @@ const App = () => {
   const [scene, setScene] = useState(story.start);
   const [text, setText] = useState("");
   const [typing, setTyping] = useState(true);
-
+  const [textColor, setTextColor] = useState("");
   useEffect(() => {
     let i = -1;
     setText(""); // Очистка текста перед началом
     const speed = scene.text === story.deception.text ? 300 : 70;
     const audio = new Audio(floweySound);
     const endAudio = new Audio(endSound);
+
+    audio.loop = true;
+    endAudio.loop = true;
 
     if (scene.text === story.deception.text) {
       endAudio.play();
@@ -168,6 +172,7 @@ const App = () => {
       if (i < scene.text.length) {
         setText((prev) => prev + scene.text.charAt(i));
         if (scene.text === story.deception.text) {
+          setTextColor("red");
           endAudio.play();
         } else {
           audio.play();
@@ -192,12 +197,12 @@ const App = () => {
 
   return (
     <div className="body">
-      <div id="scene-text" className="sceneText">
+      <div id="scene-text" style={{ color: textColor }}>
         {text}
       </div>
       <div id="options" className="options">
         {!typing &&
-          scene.options.map((option, index) => (
+          scene?.options?.map((option, index) => (
             <button
               key={index}
               onClick={() => handleOptionClick(option.next)}
